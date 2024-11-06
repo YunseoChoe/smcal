@@ -29,7 +29,6 @@ public class LoginController extends HttpServlet {
 
         // 세션이 존재하면 메인 페이지로 이동
         if(loginInfo != null) {
-            System.out.println("세션에 저장된 logininfo: " + loginInfo);
             request.getRequestDispatcher("/index.jsp").forward(request, response);
         }
         // 세션이 존재하지 않으면 로그인 페이지로 이동

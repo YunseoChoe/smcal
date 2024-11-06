@@ -11,6 +11,11 @@
     <title>signup</title>
 </head>
 <body>
-  <h1>회원가입 페이지</h1>
+<h1>회원가입 페이지</h1>
+<form method="post" action="/signup" class="login-form">
+    <input type="text" name="username" placeholder="아이디" required>
+    <input type="password" name="password" placeholder="비밀번호" required>
+    <input type="submit" value="회원가입">
+</form>
 </body>
 </html>

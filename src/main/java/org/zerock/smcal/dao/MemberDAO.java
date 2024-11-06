@@ -11,6 +11,7 @@ import java.lang.reflect.Member;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class MemberDAO {
     // insert
@@ -50,7 +51,7 @@ public class MemberDAO {
     }
 
     // duplicate check
-    public boolean duplicate(MemberVO member) throws Exception {
+    public boolean duplicate(MemberVO member) throws SQLException {
         String sql = "SELECT username FROM smcal_user WHERE username = ?";
         boolean isDuplicated = false; // 중복인지 값을 저장하는 변수
 
@@ -61,9 +62,9 @@ public class MemberDAO {
             pstmt.setString(1, member.getUsername());
 
             ResultSet rs = pstmt.executeQuery();
-            System.out.println((rs.next()));
+//            System.out.println((rs.next())); // 확인용 출력
 
-            return rs.next();
+            return rs.next(); // true이면 중복
         }
     }
 }

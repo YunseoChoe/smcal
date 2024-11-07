@@ -1,5 +1,6 @@
 package org.zerock.smcal.vo;
 
+import java.sql.Date;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -10,8 +11,9 @@ import lombok.AllArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 
-public class LoginVO {
+public class CalendarVO {
+    private int cal_id;
     private int user_id;
-    private String username;
-    private String password;
+    private String cal_content;
+    private Date cal_date;
 }

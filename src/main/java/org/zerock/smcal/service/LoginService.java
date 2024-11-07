@@ -20,4 +20,9 @@ public enum LoginService {
         LoginVO loginVO = this.modelMapper.map(loginDTO, LoginVO.class);
         return memberDAO.equal(loginVO);
     }
+
+    // username으로 user_id 조회
+    public int getUserIdByUsername(String username) throws Exception {
+        return memberDAO.getUserId(username); // memberDAO에서 user_id를 조회
+    }
 }

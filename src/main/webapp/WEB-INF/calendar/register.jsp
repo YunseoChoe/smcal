@@ -8,13 +8,19 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>register</title>
 </head>
 <body>
   <h1>달력 작성하기 페이지</h1>
-  <div class="calendar-class">
-    <input type="date" />
-    <input type="text" placeholder="내용을 입력해주세요." value="content"/>
-  </div>
+  <form action="/register" method="post" class="register-form">
+    <input type="date" name="cal_date" required>
+    <input type="text" name="cal_content" required>
+    <input type="submit" value="작성">
+  </form>
+
+
+
+
 </body>
 </html>

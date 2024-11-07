@@ -8,9 +8,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>signup error</title>
 </head>
 <body>
   <h1>회원가입 에러 페이지</h1>
+  <button onclick="window.location.href='/signup';">회원가입</button>
+  <button onclick="window.location.href='/smcal';">로그인</button>
 </body>
 </html>

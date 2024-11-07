@@ -8,9 +8,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>login error</title>
 </head>
 <body>
     <h1>로그인 에러 페이지</h1>
+    <button onclick="window.location.href='/smcal';">로그인</button>
 </body>
 </html>

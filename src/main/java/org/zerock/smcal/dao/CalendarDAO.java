@@ -5,13 +5,15 @@ import org.zerock.smcal.util.DBConnectionUtil;
 import org.zerock.smcal.vo.CalendarVO;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CalendarDAO {
     // calendar insert
     public int calendarInsert(CalendarVO calendar) throws Exception {
         String sql = "INSERT INTO smcal_calendar (user_id, cal_content, cal_date) VALUES (?,?,?)";
 
-// DB 연결과 PreparedStatement 객체 자동 관리
+        // DB 연결과 PreparedStatement 객체 자동 관리
         @Cleanup Connection connection = DBConnectionUtil.INSTANCE.getConnection();
         @Cleanup PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
@@ -58,5 +60,27 @@ public class CalendarDAO {
         } else {
             throw new SQLException("Calendar update failed, no rows affected.");
         }
+    }
+
+    // calendar read
+    public List<CalendarVO> calendarRead() throws Exception {
+        List<CalendarVO> calendarList = new ArrayList<>();
+
+        String sql = "SELECT user_id, cal_id, cal_content, cal_date FROM smcal_calendar";
+
+        @Cleanup Connection connection = DBConnectionUtil.INSTANCE.getConnection();
+        @Cleanup PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        @Cleanup ResultSet resultSet = preparedStatement.executeQuery();
+
+        while (resultSet.next()) {
+            CalendarVO calendar = new CalendarVO();
+            calendar.setCal_id(resultSet.getInt("cal_id"));
+            calendar.setUser_id(resultSet.getInt("user_id"));
+            calendar.setCal_content(resultSet.getString("cal_content"));
+            calendar.setCal_date(resultSet.getDate("cal_date"));
+            calendarList.add(calendar);
+        }
+
+        return calendarList;
     }
 }

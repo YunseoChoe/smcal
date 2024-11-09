@@ -25,4 +25,8 @@ public enum LoginService {
     public int getUserIdByUsername(String username) throws Exception {
         return memberDAO.getUserId(username); // memberDAO에서 user_id를 조회
     }
+
+    public String getUsernameById(int userId) throws Exception {
+        return memberDAO.getUsername(userId);
+    }
 }

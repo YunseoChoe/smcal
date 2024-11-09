@@ -87,4 +87,23 @@ public class MemberDAO {
             throw new SQLException("No user found with username: " + username);
         }
     }
+
+    public String getUsername(int user_id) throws SQLException {
+        String sql = "SELECT username FROM smcal_user WHERE user_id = ?";
+
+        // DB 연결과 PreparedStatement 객체 자동 관리
+        @Cleanup Connection connection = DBConnectionUtil.INSTANCE.getConnection();
+        @Cleanup PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+        preparedStatement.setInt(1, user_id); // username 설정
+
+        // 쿼리 실행 후 결과 받아오기
+        @Cleanup ResultSet resultSet = preparedStatement.executeQuery();
+
+        if (resultSet.next()) {
+            return resultSet.getString("username"); // user_id를 반환
+        } else {
+            throw new SQLException("No user found with user_id: " + user_id);
+        }
+    }
 }

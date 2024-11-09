@@ -27,74 +27,17 @@ public class MainController extends HttpServlet {
     private LoginService loginService = LoginService.INSTANCE;
     private CalendarService calendarService = CalendarService.INSTANCE;
 
-//    @Override
-//    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-//        // 세션 확인
-//        HttpSession session = request.getSession(false);
-//        System.out.println(session.getId()); // session_id값
-//
-//        String loginInfo = (String) session.getAttribute("logininfo");
-//        System.out.println("loginInfo : " + loginInfo);
-//
-//        // 세션이 존재하면 메인 페이지로 이동
-//        if(loginInfo != null) {
-//            try {
-//                // 달력 정보를 가져옴
-//                List<CalendarVO> allCalendars = calendarService.getAllCalendars();
-//
-//                // 오늘 날짜를 기준으로 달력 정보 설정
-//                LocalDate today = LocalDate.now();
-//                int currentMonth = today.getMonthValue(); // 현재 월
-//                int currentYear = today.getYear(); // 현재 년도
-//                int currentDay = today.getDayOfMonth(); // 오늘 날짜
-//
-//                // 해당 월의 첫 번째 날짜와 마지막 날짜 계산
-//                LocalDate firstDayOfMonth = today.withDayOfMonth(1);
-//                LocalDate lastDayOfMonth = today.withDayOfMonth(today.lengthOfMonth());
-//
-//                // 달력에 표시할 날짜 리스트 생성 (첫 번째 날부터 마지막 날까지)
-//                List<LocalDate> daysInMonth = new ArrayList<>();
-//                for (LocalDate date = firstDayOfMonth; !date.isAfter(lastDayOfMonth); date = date.plusDays(1)) {
-//                    daysInMonth.add(date);
-//                }
-//
-//                // 각 날짜에 대한 일정 리스트를 Map으로 저장
-//                Map<LocalDate, List<CalendarVO>> calendarMap = new HashMap<>();
-//                for (CalendarVO calendar : allCalendars) {
-//                    LocalDate calendarDate = calendar.getCal_date().toLocalDate(); // CalendarVO에서 Date를 LocalDate로 변환
-//                    calendarMap.putIfAbsent(calendarDate, new ArrayList<>());
-//                    calendarMap.get(calendarDate).add(calendar);
-//                }
-//
-//                // 데이터들을 request에 설정
-//                request.setAttribute("daysInMonth", daysInMonth);
-//                request.setAttribute("calendarMap", calendarMap);
-//                request.setAttribute("currentMonth", currentMonth);
-//                request.setAttribute("currentYear", currentYear);
-//
-//                // 달력 정보 출력 (디버깅용)
-//                for (Map.Entry<LocalDate, List<CalendarVO>> entry : calendarMap.entrySet()) {
-//                    System.out.println("날짜: " + entry.getKey() + " -> 일정 수: " + entry.getValue().size());
-//                }
-//
-//                // 달력 정보를 전달한 뒤 메인 페이지로 포워드
-//                request.getRequestDispatcher("/index.jsp").forward(request, response);
-//
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                System.out.println("일정 조회 중 에러가 발생하였습니다.");
-////                request.getRequestDispatcher("/errorPage.jsp").forward(request, response);
-//            }
-//        }
-//        // 세션이 존재하지 않으면 로그인 페이지로 이동
-//        else {
-//            System.out.println("사용자 세션이 존재하지 않습니다. 로그인 페이지로 이동하겠습니다.");
-//            request.getRequestDispatcher("/WEB-INF/member/login.jsp").forward(request, response);
-//        }
-//    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        // 파라미터를 가져옴
+        String monthParam = request.getParameter("month");
+        String yearParam = request.getParameter("year");
+
+        // 오늘 날짜를 기준으로 기본값 설정
+        LocalDate today = LocalDate.now();
+        int thisMonth = (monthParam != null) ? Integer.parseInt(monthParam) : today.getMonthValue();
+        int thisYear = (yearParam != null) ? Integer.parseInt(yearParam) : today.getYear();
+
         // 세션 확인
         HttpSession session = request.getSession(false);
         String loginInfo = (session != null) ? (String) session.getAttribute("logininfo") : null;
@@ -105,14 +48,9 @@ public class MainController extends HttpServlet {
                 // 달력 정보를 가져옴
                 List<CalendarVO> allCalendars = calendarService.getAllCalendars();
 
-                // 오늘 날짜를 기준으로 달력 정보 설정
-                LocalDate today = LocalDate.now();
-                int currentMonth = today.getMonthValue(); // 현재 월
-                int currentYear = today.getYear(); // 현재 년도
-
                 // 해당 월의 첫 번째 날짜와 마지막 날짜 계산
-                LocalDate firstDayOfMonth = today.withDayOfMonth(1); // 이번 달 첫째 날
-                LocalDate lastDayOfMonth = today.withDayOfMonth(today.lengthOfMonth()); // 이번 달 마지막 날
+                LocalDate firstDayOfMonth = LocalDate.of(thisYear, thisMonth, 1); // 지정한 달의 첫째 날
+                LocalDate lastDayOfMonth = firstDayOfMonth.withDayOfMonth(firstDayOfMonth.lengthOfMonth()); // 지정한 달의 마지막 날
 
                 // 달력에 표시할 날짜 리스트 생성 (첫 번째 날부터 마지막 날까지)
                 List<LocalDate> daysInMonth = new ArrayList<>();
@@ -134,8 +72,8 @@ public class MainController extends HttpServlet {
                 request.setAttribute("allCalendars", allCalendars);
                 request.setAttribute("daysInMonth", daysInMonth);  // 이번 달 날짜 목록
                 request.setAttribute("calendarMap", calendarMap);  // 각 날짜별 일정
-                request.setAttribute("currentMonth", currentMonth); // 현재 월
-                request.setAttribute("currentYear", currentYear);   // 현재 년도
+                request.setAttribute("currentMonth", thisMonth); // 현재 월
+                request.setAttribute("currentYear", thisYear);   // 현재 년도
 
                 // 모든 user_id를 request에 추가 (int 타입)
                 List<Integer> userIds = allCalendars.stream()
@@ -155,6 +93,7 @@ public class MainController extends HttpServlet {
             request.getRequestDispatcher("/WEB-INF/member/login.jsp").forward(request, response);
         }
     }
+
 
 
     @SneakyThrows

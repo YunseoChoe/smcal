@@ -1,5 +1,3 @@
-
-
 <%--<%@ page import="org.zerock.smcal.vo.CalendarVO" %>--%>
 <%--<%@ page import="java.util.List" %>--%>
 <%--<%@ page import="java.time.LocalDate" %>--%>
@@ -8,35 +6,6 @@
 <%--  User: choeyunseo--%>
 <%--  Date: 2024. 11. 6.--%>
 <%--  Time: 오후 3:19--%>
-<%--  To change this template use File | Settings | File Templates.--%>
-
-<%--<%@ page contentType="text/html;charset=UTF-8" language="java" %>--%>
-<%--<html>--%>
-<%--  <head>--%>
-<%--    <meta charset="UTF-8">--%>
-<%--    <title>main</title>--%>
-<%--  </head>--%>
-<%--  <body>--%>
-<%--    <h1>메인 페이지</h1>--%>
-<%--    <input type="date" />--%>
-<%--    <br>--%>
-<%--    <button onclick="window.location.href='/register';">캘린더 작성</button>--%>
-<%--    <button onclick="window.location.href='/logout';">로그아웃</button>--%>
-<%--  </body>--%>
-<%--</html>--%>
-
-<!-- allCalendars 값 출력하기 -->
-<%--<%--%>
-<%--  List<CalendarVO> allCalendars = (List<CalendarVO>) request.getAttribute("allCalendars");--%>
-<%--  for (CalendarVO calendar : allCalendars) {--%>
-<%--%>--%>
-<%--<p>일정 ID: <%= calendar.getCal_id() %></p>--%>
-<%--<p>일정 내용: <%= calendar.getCal_content() %></p>--%>
-<%--<p>일정 날짜: <%= calendar.getCal_date() %></p>--%>
-<%--<hr/>--%>
-<%--<%--%>
-<%--  }--%>
-<%--%>--%>
 
 <%@ page import="java.util.Calendar" %>
 <%@ page import="java.util.GregorianCalendar" %>
@@ -101,6 +70,21 @@
   }
 %>
 
+<!-- 이전 달, 다음 달 버튼 -->
+<div>
+  <form action="/smcal" method="get">
+    <input type="hidden" name="month" value="<%= (month+1) == 1 ? 12 : (month)%>">
+    <input type="hidden" name="year" value="<%= (month+1) == 1 ? year - 1 : year %>">
+    <button type="submit">이전 달</button>
+  </form>
+
+  <form action="/smcal" method="get">
+    <input type="hidden" name="month" value="<%= (month+1) == 12 ? 1 : (month+2)%>">
+    <input type="hidden" name="year" value="<%= (month+1)  == 12 ? year+1 : year %>">
+    <button type="submit">다음 달</button>
+  </form>
+</div>
+
 <table>
   <tr>
     <th>일</th>
@@ -123,14 +107,19 @@
       // 날짜 출력
       for (int day = 1; day <= daysInMonth; day++) {
         String dateStr;
-        if(day < 10) {
-          dateStr = year + "-" + (month + 1) + "-0" + day; // 날짜 문자열 (yyyy-MM-dd)
-        } else {
-          dateStr = year + "-" + (month + 1) + "-" + day; // 날짜 문자열 (yyyy-MM-dd)
+        String new_month = Integer.toString(month+1);
+        String new_day = Integer.toString(day);
+        if(month+1 < 10) {
+          new_month = ""+ month+1;
         }
+        if(day < 10) {
+          new_day = "0" + day;
+        }
+        dateStr = year + "-" + new_month + "-" + new_day;
         String eventContent = scheduledEvents.get(dateStr); // 해당 날짜의 일정 내용
         Integer userId = scheduledUserIds.get(dateStr); // 해당 날짜의 user_id
     %>
+
     <td style="color: <%= eventContent != null ? "red" : "black" %>;">
       <%= day %>
       <%

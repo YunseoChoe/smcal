@@ -1,6 +1,7 @@
 package org.zerock.smcal.controller.calendar;
 
 import org.zerock.smcal.service.CalendarService;
+import org.zerock.smcal.service.LoginService;
 import org.zerock.smcal.vo.CalendarVO;
 
 import javax.servlet.RequestDispatcher;
@@ -9,20 +10,36 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Date;
 
 @WebServlet("/update")
 public class UpdateController extends HttpServlet {
     private CalendarService calendarService = CalendarService.INSTANCE;
+    private LoginService loginService = LoginService.INSTANCE;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // 세션 정보 가져오기
+        HttpSession session = request.getSession();
+        String loginInfo = (String) session.getAttribute("logininfo");
+
+        String[] loginDetails = loginInfo.split(":");
+        String username = loginDetails[0];
+
         int calId = Integer.parseInt(request.getParameter("cal_id"));
 
         try {
             CalendarVO calendar = calendarService.getCalendarById(calId);
             request.setAttribute("calendars", calendar);
+            int user_id = calendar.getUser_id();
+            String getUsername = loginService.getUsernameById(user_id);
+            if (!getUsername.equals(username)) {
+                RequestDispatcher rd = request.getRequestDispatcher("/WEB-INF/calendar/updateerror.jsp");
+                rd.forward(request, response);
+            }
+
             System.out.println("컨트롤러");
             System.out.println(calendar);
             RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/calendar/update.jsp");

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @WebServlet("/smcal")
 public class MainController extends HttpServlet {
@@ -96,10 +97,10 @@ public class MainController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         // 세션 확인
         HttpSession session = request.getSession(false);
-        String loginInfo = (String) session.getAttribute("logininfo");
+        String loginInfo = (session != null) ? (String) session.getAttribute("logininfo") : null;
 
         // 세션이 존재하면 메인 페이지로 이동
-        if(loginInfo != null) {
+        if (loginInfo != null) {
             try {
                 // 달력 정보를 가져옴
                 List<CalendarVO> allCalendars = calendarService.getAllCalendars();
@@ -131,24 +132,30 @@ public class MainController extends HttpServlet {
 
                 // 달력 정보를 request에 설정
                 request.setAttribute("allCalendars", allCalendars);
-
-                // 데이터를 request에 설정
                 request.setAttribute("daysInMonth", daysInMonth);  // 이번 달 날짜 목록
                 request.setAttribute("calendarMap", calendarMap);  // 각 날짜별 일정
                 request.setAttribute("currentMonth", currentMonth); // 현재 월
                 request.setAttribute("currentYear", currentYear);   // 현재 년도
 
+                // 모든 user_id를 request에 추가 (int 타입)
+                List<Integer> userIds = allCalendars.stream()
+                        .map(CalendarVO::getUser_id)
+                        .collect(Collectors.toList());
+                request.setAttribute("userIds", userIds); // 모든 user_id 리스트
+
                 // 메인 페이지로 포워드
                 request.getRequestDispatcher("/index.jsp").forward(request, response);
             } catch (Exception e) {
                 e.printStackTrace();
-                System.out.println("일정 조회 중 에러가 발생하였습니다.");
+                request.setAttribute("errorMessage", "일정 조회 중 에러가 발생하였습니다."); // 에러 메시지 설정
+                request.getRequestDispatcher("/WEB-INF/error.jsp").forward(request, response); // 에러 페이지로 포워드
             }
-        }
-        else {
+        } else {
+            // 로그인 페이지로 포워드
             request.getRequestDispatcher("/WEB-INF/member/login.jsp").forward(request, response);
         }
     }
+
 
     @SneakyThrows
     @Override

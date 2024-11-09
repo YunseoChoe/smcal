@@ -39,8 +39,8 @@ public class CalendarDAO {
     }
 
     // calendar update
-    public int calendarUpdate(CalendarVO calendar) throws Exception {
-        String sql = "UPDATE smcal_calendar SET cal_content = ?, cal_date = ? WHERE cal_id = ?";
+    public void calendarUpdate(CalendarVO calendar) throws Exception {
+        String sql = "UPDATE smcal_calendar SET cal_content = ? WHERE cal_id = ?";
 
         // DB 연결과 PreparedStatement 객체 자동 관리
         @Cleanup Connection connection = DBConnectionUtil.INSTANCE.getConnection();
@@ -48,16 +48,13 @@ public class CalendarDAO {
 
         // 수정하려는 일정의 cal_content와 cal_date를 설정
         preparedStatement.setString(1, calendar.getCal_content()); // 수정할 내용
-        preparedStatement.setDate(2, calendar.getCal_date());  // 수정할 날짜
-        preparedStatement.setInt(3, calendar.getCal_id()); // 수정할 일정의 cal_id
+        preparedStatement.setInt(2, calendar.getCal_id()); // 수정할 일정의 cal_id
 
         // 실행 후 업데이트된 행의 수를 반환
         int rowsAffected = preparedStatement.executeUpdate();
 
         // 업데이트된 행이 하나 이상 있으면 수정 성공, 0이면 실패
-        if (rowsAffected > 0) {
-            return rowsAffected; // 성공적으로 수정된 행 수 반환
-        } else {
+        if (rowsAffected < 0) {
             throw new SQLException("Calendar update failed, no rows affected.");
         }
     }
@@ -66,7 +63,7 @@ public class CalendarDAO {
     public List<CalendarVO> calendarRead() throws Exception {
         List<CalendarVO> calendarList = new ArrayList<>();
 
-        String sql = "SELECT user_id, cal_id, cal_content, cal_date FROM smcal_calendar";
+        String sql = "SELECT * FROM smcal_calendar";
 
         @Cleanup Connection connection = DBConnectionUtil.INSTANCE.getConnection();
         @Cleanup PreparedStatement preparedStatement = connection.prepareStatement(sql);
@@ -83,4 +80,33 @@ public class CalendarDAO {
 
         return calendarList;
     }
+
+    // calendar read by ID
+    public CalendarVO calendarReadById(int calId) throws SQLException {
+        CalendarVO calendar = null;
+        String sql = "SELECT * FROM smcal_calendar WHERE cal_id = ?";
+
+        try (Connection connection = DBConnectionUtil.INSTANCE.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+            // cal_id를 설정
+            preparedStatement.setInt(1, calId);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                // 결과가 존재하면 CalendarVO 객체를 생성
+                if (resultSet.next()) {
+                    calendar = new CalendarVO();
+                    calendar.setCal_id(resultSet.getInt("cal_id"));
+                    calendar.setUser_id(resultSet.getInt("user_id"));
+                    calendar.setCal_content(resultSet.getString("cal_content"));
+                    calendar.setCal_date(resultSet.getDate("cal_date"));
+                }
+            }
+        } catch (SQLException e) {
+            // 예외 처리 로직 추가 (로깅 등)
+            throw new SQLException("Error reading calendar by ID", e);
+        }
+
+        return calendar; // 조회된 CalendarVO 객체 반환
+    }
+
 }

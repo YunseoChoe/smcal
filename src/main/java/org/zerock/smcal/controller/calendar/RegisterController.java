@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.Date;
+import java.util.List;
 
 @WebServlet("/register")
 public class RegisterController extends HttpServlet {
@@ -24,7 +25,21 @@ public class RegisterController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // 일정 등록 페이지로 이동
         System.out.println("일정 등록하기로 이동 중 ..");
-        request.getRequestDispatcher("/WEB-INF/calendar/register.jsp").forward(request, response);
+
+        try {
+            // 모든 일정 목록을 가져오기
+            List<CalendarVO> calendars = CalendarService.INSTANCE.getAllCalendars();
+
+            // 일정 목록을 request에 저장
+            request.setAttribute("calendars", calendars);
+            System.out.println(calendars);
+
+            // 일정 등록 페이지로 포워드
+            request.getRequestDispatcher("/WEB-INF/calendar/register.jsp").forward(request, response);
+        } catch (Exception e) {
+            e.printStackTrace(); // 예외 로그 출력
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "일정 목록 조회 중 오류가 발생했습니다.");
+        }
     }
 
     @Override

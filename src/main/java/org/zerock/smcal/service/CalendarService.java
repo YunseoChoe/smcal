@@ -20,12 +20,21 @@ public enum CalendarService {
     }
 
     // 일정 수정 메서드
-    public int updateCalendar(CalendarVO calendar) throws Exception {
-        return calendarDAO.calendarUpdate(calendar);
+    public void updateCalendar(CalendarVO calendarVO) throws Exception {
+        calendarDAO.calendarUpdate(calendarVO);
     }
 
     // 일정 조회 메서드
     public List<CalendarVO> getAllCalendars() throws Exception {
         return calendarDAO.calendarRead();
+    }
+
+    // 일정 ID로 조회 메서드 추가
+    public  CalendarVO getCalendarById(int calId) throws Exception {
+
+        System.out.println("서비스");
+        System.out.println(calendarDAO.calendarReadById(calId).getCal_content());
+
+        return calendarDAO.calendarReadById(calId);
     }
 }

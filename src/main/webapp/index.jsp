@@ -73,14 +73,14 @@
 <!-- 이전 달, 다음 달 버튼 -->
 <div>
   <form action="/smcal" method="get">
-    <input type="hidden" name="month" value="<%= (month+1) == 1 ? 12 : (month)%>">
-    <input type="hidden" name="year" value="<%= (month+1) == 1 ? year - 1 : year %>">
+    <input type="hidden" name="month" value="<%= month == 0 ? 12 : month %>">
+    <input type="hidden" name="year" value="<%= month == 0 ? year - 1 : year %>">
     <button type="submit">이전 달</button>
   </form>
 
   <form action="/smcal" method="get">
-    <input type="hidden" name="month" value="<%= (month+1) == 12 ? 1 : (month+2)%>">
-    <input type="hidden" name="year" value="<%= (month+1)  == 12 ? year+1 : year %>">
+    <input type="hidden" name="month" value="<%= month == 11 ? 1 : month + 2 %>">
+    <input type="hidden" name="year" value="<%= month == 11 ? year + 1 : year %>">
     <button type="submit">다음 달</button>
   </form>
 </div>
@@ -107,14 +107,9 @@
       // 날짜 출력
       for (int day = 1; day <= daysInMonth; day++) {
         String dateStr;
-        String new_month = Integer.toString(month+1);
-        String new_day = Integer.toString(day);
-        if(month+1 < 10) {
-          new_month = ""+ month+1;
-        }
-        if(day < 10) {
-          new_day = "0" + day;
-        }
+        String new_month = (month + 1) < 10 ? "0" + (month + 1) : Integer.toString(month + 1); // 두 자리 문자열로 변환
+        String new_day = day < 10 ? "0" + day : Integer.toString(day); // 두 자리 문자열로 변환
+
         dateStr = year + "-" + new_month + "-" + new_day;
         String eventContent = scheduledEvents.get(dateStr); // 해당 날짜의 일정 내용
         Integer userId = scheduledUserIds.get(dateStr); // 해당 날짜의 user_id

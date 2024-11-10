@@ -10,12 +10,14 @@ repositories {
     mavenCentral()
 }
 
+// JUnit 버전
 ext {
     junitVersion = '5.10.2'
 }
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+// Java 버전 설정 (11로 변경)
+sourceCompatibility = '11'
+targetCompatibility = '11'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
